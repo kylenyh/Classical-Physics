@@ -1,1 +1,113 @@
+import pygame
+import sys
+import math
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 1000, 800
+BACKGROUND_COLOR = (255, 255, 255)
+BALL_RADIUS = 10  # Smaller ball size
+BALL_COLOR1 = (255, 0, 0)
+BALL_COLOR2 = (0, 0, 255)
+
+# Screen setup
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Elastic Collision Simulation")
+
+# Ball properties
+ball1_x, ball1_y = 200, 400
+ball2_x, ball2_y = 500, 400
+ball1_velocity_x, ball1_velocity_y = 8, 0
+ball2_velocity_x, ball2_velocity_y = 0, 0  # Stationary ball2
+mass1, mass2 = 5, 3  # Mass of the balls
+
+# Time setup
+clock = pygame.time.Clock()
+
+# Font setup
+font = pygame.font.Font(None, 24)
+
+# Lists to track parameters before and after the collision
+time_list = []
+mass_list_before = []
+mass_list_after = []
+velocity_list_before = []
+velocity_list_after = []
+ke_before_list = []
+ke_after_list = []
+
+# Main game loop
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Clear the screen
+    screen.fill(BACKGROUND_COLOR)
+
+    # Calculate total kinetic energy before the collision
+    ke_before = (
+        0.5 * mass1 * (ball1_velocity_x ** 2) + 0.5 * mass2 * (ball2_velocity_x ** 2)
+    )
+
+    # Update ball positions
+    ball1_x += ball1_velocity_x
+    ball2_x += ball2_velocity_x
+
+    # Check for collision
+    distance = abs(ball1_x - ball2_x)
+    if distance <= 2 * BALL_RADIUS:
+        # Elastic collision calculations
+        v1_final = (
+            (mass1 - mass2) / (mass1 + mass2) * ball1_velocity_x
+            + (2 * mass2) / (mass1 + mass2) * ball2_velocity_x
+        )
+        v2_final = (
+            (2 * mass1) / (mass1 + mass2) * ball1_velocity_x
+            - (mass1 - mass2) / (mass1 + mass2) * ball2_velocity_x
+        )
+        ball1_velocity_x, ball2_velocity_x = v1_final, v2_final
+
+    # Calculate total kinetic energy after the collision
+    ke_after = (
+        0.5 * mass1 * (ball1_velocity_x ** 2) + 0.5 * mass2 * (ball2_velocity_x ** 2)
+    )
+
+    # Update time and parameter lists
+    time_list.append(pygame.time.get_ticks() / 1000)  # Convert milliseconds to seconds
+    mass_list_before.append((mass1, mass2))
+    mass_list_after.append((mass1, mass2))
+    velocity_list_before.append((ball1_velocity_x, ball2_velocity_x))
+    velocity_list_after.append((ball1_velocity_x, ball2_velocity_x))
+    ke_before_list.append(ke_before)
+    ke_after_list.append(ke_after)
+
+    # Draw the balls
+    pygame.draw.circle(screen, BALL_COLOR1, (int(ball1_x), int(ball1_y)), BALL_RADIUS)
+    pygame.draw.circle(screen, BALL_COLOR2, (int(ball2_x), int(ball2_y)), BALL_RADIUS)
+
+    # Display parameters on the screen
+    parameters_text = [
+        "Elastic Collision Simulation",
+        f"Time: {time_list[-1]:.2f} s",
+        f"Mass Before: m1={mass_list_before[-1][0]}, m2={mass_list_before[-1][1]}",
+        f"Mass After: m1={mass_list_after[-1][0]}, m2={mass_list_after[-1][1]}",
+        f"Velocity Before: v1={velocity_list_before[-1][0]:.2f}, v2={velocity_list_before[-1][1]:.2f}",
+        f"Velocity After: v1={velocity_list_after[-1][0]:.2f}, v2={velocity_list_after[-1][1]:.2f}",
+        f"Kinetic Energy Before: {ke_before_list[-1]:.2f} J",
+        f"Kinetic Energy After: {ke_after_list[-1]:.2f} J",
+    ]
+
+    for i, text in enumerate(parameters_text):
+        text_surface = font.render(text, True, (0, 0, 0))
+        screen.blit(text_surface, (10, 10 + i * 30))
+
+    # Update the display
+    pygame.display.update()
+
+    # Set the frame rate
+    clock.tick(60)
 
