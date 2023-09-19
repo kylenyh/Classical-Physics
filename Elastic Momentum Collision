@@ -11,6 +11,9 @@ ball_color = (0, 0, 255)
 ball_radius = 10  # Smaller ball size
 font_size = 20  # Font size for details
 
+# Initialize new_velocity
+new_velocity = 0
+
 # Create the Pygame window
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Elastic Collision")
