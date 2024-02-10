@@ -1,6 +1,8 @@
+
+# Library imports
 import pygame
 import math
-
+ 
 pygame.init()
 
 # Window dimensions
