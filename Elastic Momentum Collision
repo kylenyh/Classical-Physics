@@ -1,3 +1,4 @@
+# Library imports
 import pygame
 import sys
 
